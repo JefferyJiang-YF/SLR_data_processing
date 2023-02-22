@@ -91,7 +91,7 @@ def sequential_sampling(frame_start, frame_end, num_samples):
 # print(len(sequential_sampling(0, 42, 21)))
 def normalize_video(source_folder,new_path):
     leng = len(os.listdir(source_folder))
-    for i in range(1):
+    for i in range(leng):
         process_path = os.path.join(source_folder + '{}'.format(i))
         pre_process_path = os.path.join(new_path + '{}'.format(i))
         file_list = os.listdir(process_path)
@@ -100,7 +100,11 @@ def normalize_video(source_folder,new_path):
         num = 0
         # print("-"*8)
         # print(frame_end)
-        if len(file_list) < 30:
+        if len(file_list) < 10:
+            no_frame = k_copies_fixed_length_sequential_sampling(frame_start, frame_end, 5, num_copies=6)
+        elif len(file_list) < 15:
+            no_frame = k_copies_fixed_length_sequential_sampling(frame_start, frame_end, 10, num_copies=3)
+        elif len(file_list) < 30:
             no_frame = k_copies_fixed_length_sequential_sampling(frame_start, frame_end, 15, num_copies=2)
         elif len(file_list)>30 and len(file_list)<=60:
             no_frame = rand_start_sampling(frame_start, frame_end, 30)
@@ -108,9 +112,9 @@ def normalize_video(source_folder,new_path):
             no_frame = sequential_sampling(frame_start, frame_end, 31)
         else:
             no_frame = [ i for i in range(30)]
-        print(process_path)
-        print(pre_process_path)
-        print(no_frame)
+        # print(process_path)
+        # print(pre_process_path)
+        # print(no_frame)
         for file_obj in file_list:
             file_path=os.path.join(process_path,file_obj)
             file_name,file_extend=os.path.splitext(file_obj)
@@ -119,17 +123,20 @@ def normalize_video(source_folder,new_path):
                 #print(no_frame)
                # print(file_name)
                 if file_name == str(no_frame[j]):
-                    print(j)
+                    # print(j)
                     new_name = str(num) + file_extend
                     num += 1
                     newfile_path = os.path.join(pre_process_path, new_name)
                     shutil.copyfile(file_path,newfile_path)
-                    print("Done")
+                    # print("Done")
                 else:
                     continue
             
 if __name__ == '__main__':
-    mkdir_actions(actions = np.array(['bed','thank you','book']))
-    source_folder=r'NP_Data/raw/book/'
-    new_path = r'NP_Data/pre_processing/book/'
-    normalize_video(source_folder, new_path)
+    actions = np.array(['bed','book','big','potato','thankyou'])
+    mkdir_actions(actions)
+    for action in actions:
+        source_folder=r'NP_Data/raw/{}/'.format(action)
+        new_path = r'NP_Data/pre_processing/{}/'.format(action)
+        normalize_video(source_folder, new_path)
+    # print(k_copies_fixed_length_sequential_sampling(0, 14, 10, num_copies=3))
